@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-body {
+body{
   margin:0;
   font-family:Poppins;
   background:#0f2027;
@@ -16,8 +16,8 @@ body {
   overflow-x:hidden;
 }
 
-/* Animated background */
-body::before {
+/* Animated Indian pattern */
+body::before{
   content:"";
   position:fixed;
   width:200%;
@@ -27,45 +27,45 @@ body::before {
   animation:move 50s linear infinite;
   z-index:-1;
 }
-@keyframes move {
-  from {transform:translate(0,0);}
-  to {transform:translate(300px,300px);}
+@keyframes move{
+  from{transform:translate(0,0);}
+  to{transform:translate(300px,300px);}
 }
 
-.hero {
+.hero{
   text-align:center;
   padding:60px 20px;
 }
 
-.products {
+.products{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
   gap:20px;
   padding:20px;
 }
 
-.card {
+.card{
   background:#ffffff10;
   border-radius:15px;
   overflow:hidden;
-  transition:0.4s;
   cursor:pointer;
+  transition:0.4s;
 }
-.card:hover {
+.card:hover{
   transform:scale(1.05);
 }
 
-.card img {
+.card img{
   width:100%;
   height:200px;
   object-fit:cover;
 }
 
-.card-content {
+.card-content{
   padding:10px;
 }
 
-button {
+button{
   background:linear-gradient(45deg,#ff6a00,#ee0979);
   border:none;
   padding:8px 12px;
@@ -75,7 +75,7 @@ button {
 }
 
 /* MODAL */
-.modal {
+.modal{
   position:fixed;
   inset:0;
   background:#000a;
@@ -84,36 +84,30 @@ button {
   align-items:center;
 }
 
-.box {
+.box{
   background:#111;
   padding:20px;
   border-radius:12px;
   width:320px;
-  animation:fade 0.4s ease;
-}
-
-@keyframes fade {
-  from {opacity:0; transform:translateY(20px);}
-  to {opacity:1; transform:translateY(0);}
 }
 
 /* SLIDER */
-.slider {
+.slider{
   position:relative;
 }
 
-.slider img {
+.slider img{
   width:100%;
   height:200px;
   object-fit:cover;
   border-radius:10px;
   transition:0.3s;
 }
-.slider img:hover {
+.slider img:hover{
   transform:scale(1.2);
 }
 
-.nav-btn {
+.nav-btn{
   position:absolute;
   top:50%;
   transform:translateY(-50%);
@@ -123,9 +117,8 @@ button {
   padding:5px 10px;
   cursor:pointer;
 }
-.prev { left:5px; }
-.next { right:5px; }
-
+.prev{left:5px;}
+.next{right:5px;}
 </style>
 </head>
 
@@ -140,17 +133,17 @@ button {
 
 <!-- MODAL -->
 <div class="modal" id="modal">
-  <div class="box" onclick="event.stopPropagation()">
+  <div class="box" id="modalBox">
     <div class="slider">
-      <button class="nav-btn prev" onclick="prev()">‹</button>
+      <button class="nav-btn prev" id="prevBtn">‹</button>
       <img id="slideImg">
-      <button class="nav-btn next" onclick="next()">›</button>
+      <button class="nav-btn next" id="nextBtn">›</button>
     </div>
 
     <h3 id="pname"></h3>
     <p id="pprice"></p>
 
-    <button onclick="closeModal()">Close</button>
+    <button id="closeBtn">Close</button>
   </div>
 </div>
 
@@ -173,18 +166,37 @@ let sliderInterval = null;
 
 const productsEl = document.getElementById("products");
 const modal = document.getElementById("modal");
+const modalBox = document.getElementById("modalBox");
+const slideImg = document.getElementById("slideImg");
 
 function renderProducts(){
-  productsEl.innerHTML = products.map((p,i)=>`
-    <div class="card" onclick="openProduct(${i})">
-      <img src="${p.imgs[0]}">
+  productsEl.innerHTML = "";
+
+  products.forEach((p,i)=>{
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <img src="${p.imgs[0]}" alt="">
       <div class="card-content">
         <h3>${p.name}</h3>
         <p>₹${p.price}</p>
-        <button onclick="event.stopPropagation()">Add to Cart</button>
+        <button>Add to Cart</button>
       </div>
-    </div>
-  `).join("");
+    `;
+
+    card.addEventListener("click", ()=>{
+      openProduct(i);
+    });
+
+    const btn = card.querySelector("button");
+    btn.addEventListener("click",(e)=>{
+      e.stopPropagation();
+      alert("Added to cart");
+    });
+
+    productsEl.appendChild(card);
+  });
 }
 
 function openProduct(i){
@@ -195,12 +207,13 @@ function openProduct(i){
   document.getElementById("pprice").innerText = "₹" + products[i].price;
 
   modal.style.display = "flex";
+
   updateSlide();
   startAutoSlide();
 }
 
 function updateSlide(){
-  document.getElementById("slideImg").src = images[current];
+  slideImg.src = images[current];
 }
 
 function next(){
@@ -213,30 +226,47 @@ function prev(){
   updateSlide();
 }
 
-/* OPTIMIZED AUTOSLIDE */
 function startAutoSlide(){
-  clearInterval(sliderInterval);
+  stopAutoSlide();
   sliderInterval = setInterval(next, 3000);
 }
 
 function stopAutoSlide(){
-  clearInterval(sliderInterval);
+  if(sliderInterval){
+    clearInterval(sliderInterval);
+    sliderInterval = null;
+  }
 }
 
-/* CLOSE MODAL */
 function closeModal(){
   modal.style.display = "none";
   stopAutoSlide();
 }
 
-/* OUTSIDE CLICK CLOSE */
-modal.addEventListener("click", closeModal);
+/* EVENTS */
+document.getElementById("nextBtn").addEventListener("click",(e)=>{
+  e.stopPropagation();
+  next();
+});
 
-/* ESC KEY CLOSE */
-document.addEventListener("keydown", (e)=>{
+document.getElementById("prevBtn").addEventListener("click",(e)=>{
+  e.stopPropagation();
+  prev();
+});
+
+document.getElementById("closeBtn").addEventListener("click",closeModal);
+
+modal.addEventListener("click",closeModal);
+
+modalBox.addEventListener("click",(e)=>{
+  e.stopPropagation();
+});
+
+document.addEventListener("keydown",(e)=>{
   if(e.key === "Escape") closeModal();
 });
 
+/* INIT */
 renderProducts();
 </script>
 
