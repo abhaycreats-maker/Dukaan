@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Luxury Store</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:white;
+  overflow-x:hidden;
+}
+
+/* INDIAN ART ANIMATED BACKGROUND */
+body::before {
+  content:"";
+  position:fixed;
+  width:200%;
+  height:200%;
+  top:-50%;
+  left:-50%;
+  background:url('https://www.transparenttextures.com/patterns/indian-floral.png');
+  opacity:0.08;
+  animation:moveBg 40s linear infinite;
+  z-index:-1;
+}
+
+@keyframes moveBg {
+  0% { transform:translate(0,0); }
+  100% { transform:translate(200px,200px); }
+}
+
+.hero {
+  height:60vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  background:linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1604147706283-2b3c2b1c1b75');
+  background-size:cover;
+}
+
+.hero h1 {
+  font-family:'Playfair Display',serif;
+  font-size:52px;
+}
+
+.products {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+  padding:20px;
+}
+
+.card {
+  background:rgba(255,255,255,0.08);
+  border-radius:20px;
+  overflow:hidden;
+  transition:transform 0.4s, box-shadow 0.4s;
+  transform-style:preserve-3d;
+}
+
+.card:hover {
+  transform:rotateY(10deg) rotateX(5deg) scale(1.05);
+  box-shadow:0 20px 40px rgba(0,0,0,0.5);
+}
+
+.card img {
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  transition:0.4s;
+}
+
+.card:hover img {
+  transform:scale(1.1);
+}
+
+.card-content { padding:15px; }
+
+button {
+  background:linear-gradient(45deg,#ff6a00,#ee0979);
+  border:none;
+  padding:10px;
+  color:white;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.cart {
+  position:fixed;
+  right:20px;
+  top:20px;
+  background:#0008;
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.cart-page {
+  position:fixed;
+  right:0;
+  top:0;
+  width:350px;
+  height:100%;
+  background:#111;
+  padding:20px;
+  display:none;
+  overflow:auto;
+}
+
+.product-detail {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:#000c;
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.box {
+  background:#111;
+  padding:20px;
+  border-radius:20px;
+  width:320px;
+  text-align:center;
+}
+
+/* SLIDER */
+.slider { position:relative; overflow:hidden; }
+.slider img {
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  border-radius:10px;
+  transition:transform 0.3s;
+}
+
+.slider img:hover {
+  transform:scale(1.3);
+}
+
+.slide-btn {
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  background:#0008;
+  border:none;
+  padding:5px 10px;
+  cursor:pointer;
+}
+
+.prev { left:5px; }
+.next { right:5px; }
+
+.fade { animation:fadeIn 0.6s ease; }
+
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(20px);} 
+  to {opacity:1; transform:translateY(0);} 
+}
+</style>
+</head>
+<body>
+
+<div class="hero fade">
+<h1>Luxury Experience</h1>
+<p>Premium Indian Inspired Products</p>
+</div>
+
+<div class="cart" onclick="toggleCart()">Cart (<span id="cartCount">0</span>)</div>
+
+<div class="products" id="productList"></div>
+
+<div class="cart-page" id="cartPage">
+<h2>Cart</h2>
+<div id="cartItems"></div>
+<div id="totalPrice"></div>
+</div>
+
+<div class="product-detail" id="productDetail">
+<div class="box fade" id="detailBox"></div>
+</div>
+
+<script>
+const products=[
+{name:"Watch",price:5000,imgs:[
+"https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+"https://images.unsplash.com/photo-1518544801976-3e159e50e5bb",
+"https://images.unsplash.com/photo-1508057198894-247b23fe5ade"]}
+];
+
+let cart=[];
+let currentSlide=0;
+let currentImgs=[];
+let autoSlideInterval;
+
+function renderProducts(){
+const el=document.getElementById('productList'); el.innerHTML='';
+products.forEach((p,i)=>{
+el.innerHTML+=`<div class="card" onclick="openDetail(${i})">
+<img src="${p.imgs[0]}">
+<div class="card-content">
+<h3>${p.name}</h3>
+<p>₹${p.price}</p>
+<button onclick="event.stopPropagation(); addToCart(${i})">Add to Cart</button>
+</div></div>`;
+});
+}
+
+function openDetail(i){
+currentImgs=products[i].imgs;
+currentSlide=0;
+
+const box=document.getElementById('detailBox');
+box.innerHTML=`
+<div class='slider'>
+<button class='slide-btn prev' onclick='prevSlide()'>‹</button>
+<img id='slideImg'>
+<button class='slide-btn next' onclick='nextSlide()'>›</button>
+</div>
+<h2>${products[i].name}</h2>
+<p>₹${products[i].price}</p>
+<button onclick='addToCart(${i})'>Add to Cart</button>`;
+
+document.getElementById('productDetail').style.display='flex';
+updateSlide();
+startAutoSlide();
+addSwipe();
+}
+
+function updateSlide(){ document.getElementById('slideImg').src=currentImgs[currentSlide]; }
+function nextSlide(){ currentSlide=(currentSlide+1)%currentImgs.length; updateSlide(); }
+function prevSlide(){ currentSlide=(currentSlide-1+currentImgs.length)%currentImgs.length; updateSlide(); }
+
+function startAutoSlide(){
+clearInterval(autoSlideInterval);
+autoSlideInterval=setInterval(()=>nextSlide(),3000);
+}
+
+function addSwipe(){
+let startX=0;
+const img=document.getElementById('slideImg');
+img.addEventListener('touchstart',e=>startX=e.touches[0].clientX);
+img.addEventListener('touchend',e=>{
+let endX=e.changedTouches[0].clientX;
+if(startX-endX>50) nextSlide();
+if(endX-startX>50) prevSlide();
+});
+}
+
+function addToCart(i){ cart.push(products[i]); document.getElementById('cartCount').innerText=cart.length; }
+
+function toggleCart(){ document.getElementById('cartPage').style.display='block'; }
+
+renderProducts();
+</script>
+
+</body>
+</html>
