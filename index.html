@@ -6,9 +6,10 @@
 
 <title>DesiCart Premium</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
 <style>
+
 body{
 margin:0;
 font-family:'Poppins',sans-serif;
@@ -16,20 +17,58 @@ background:#0f172a;
 color:white;
 }
 
-/* HERO WITH MADHUBANI PATTERN */
+/* HEADER FIXED */
+header{
+position:fixed;
+top:0;
+width:100%;
+padding:12px 25px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:rgba(0,0,0,0.7);
+backdrop-filter:blur(15px);
+z-index:1000;
+}
+
+/* BIGGER BRAND */
+.logo{
+font-size:28px;
+font-family:'Playfair Display',serif;
+font-weight:700;
+letter-spacing:1px;
+}
+
+/* SMALL CART BUTTON */
+.cart-btn{
+background:linear-gradient(45deg,#d4af37,#f5d76e);
+color:black;
+padding:6px 14px;
+border-radius:20px;
+cursor:pointer;
+font-size:14px;
+font-weight:600;
+transition:.3s;
+z-index:1001;
+}
+
+.cart-btn:hover{
+transform:scale(1.05);
+}
+
+/* HERO */
 .hero{
 height:70vh;
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
-text-align:center;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
 position:relative;
-background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
 overflow:hidden;
+margin-top:60px;
 }
 
-/* MADHUBANI STYLE PATTERN */
 .hero::before{
 content:"";
 position:absolute;
@@ -49,61 +88,28 @@ animation: movePattern 20s linear infinite;
 }
 
 .hero h1{
-font-size:55px;
+font-size:52px;
 font-family:'Playfair Display',serif;
 z-index:1;
 }
 
-.hero p{
-z-index:1;
-opacity:0.8;
-}
-
-/* HEADER */
-header{
-position:fixed;
-top:0;
-width:100%;
-padding:15px 30px;
-display:flex;
-justify-content:space-between;
-background:rgba(0,0,0,0.6);
-backdrop-filter:blur(15px);
-z-index:10;
-}
-
-.cart-btn{
-background:linear-gradient(45deg,#d4af37,#f5d76e);
-color:black;
-padding:10px 20px;
-border-radius:30px;
-cursor:pointer;
-font-weight:bold;
-}
-
 /* PRODUCTS */
 .products{
-padding:100px 30px;
+padding:40px 25px;
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-gap:25px;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
 }
 
 .card{
 background:rgba(255,255,255,0.05);
-backdrop-filter:blur(20px);
-border-radius:20px;
+border-radius:15px;
 padding:15px;
-transition:.4s;
-}
-
-.card:hover{
-transform:translateY(-10px);
 }
 
 .card img{
 width:100%;
-border-radius:15px;
+border-radius:10px;
 }
 
 /* BUTTON */
@@ -111,51 +117,38 @@ button{
 background:linear-gradient(45deg,#d4af37,#f5d76e);
 color:black;
 border:none;
-padding:12px;
-border-radius:10px;
+padding:10px;
+border-radius:8px;
 cursor:pointer;
-transition:.3s;
-font-weight:600;
 }
 
-button:hover{
-transform:translateY(-3px);
-}
-
-/* ADDED STATE */
 button.added{
 background:gray;
 color:white;
 cursor:not-allowed;
 }
 
-/* MODAL */
+/* MODAL FIX */
 .modal{
 display:none;
 position:fixed;
+top:0;
+left:0;
 width:100%;
 height:100%;
-background:rgba(0,0,0,0.8);
+background:rgba(0,0,0,0.85);
+z-index:2000;
 }
 
 .modal-content{
 background:#111;
-padding:25px;
-width:350px;
-margin:10% auto;
-border-radius:20px;
+padding:20px;
+width:320px;
+margin:12% auto;
+border-radius:15px;
 }
 
-/* INPUT */
-input,textarea{
-width:100%;
-padding:10px;
-margin:10px 0;
-border-radius:10px;
-border:none;
-}
-
-/* CART ITEMS */
+/* CART ITEM */
 .cart-item{
 display:flex;
 justify-content:space-between;
@@ -168,13 +161,12 @@ margin:10px 0;
 <body>
 
 <header>
-<h3>DesiCart 🇮🇳</h3>
-<div class="cart-btn" onclick="openCart()">Cart (<span id="count">0</span>)</div>
+<div class="logo">DesiCart 🇮🇳</div>
+<div class="cart-btn" onclick="openCart()">🛒 <span id="count">0</span></div>
 </header>
 
 <section class="hero">
 <h1>Luxury Indian Store</h1>
-<p>Art • Culture • Premium Shopping</p>
 </section>
 
 <section class="products" id="products"></section>
@@ -182,10 +174,8 @@ margin:10px 0;
 <!-- CART -->
 <div class="modal" id="cartModal">
 <div class="modal-content">
-<h2>Your Cart</h2>
-
+<h2>Cart</h2>
 <div id="cartItems"></div>
-
 <h3>Total: ₹<span id="total">0</span></h3>
 
 <button onclick="openCheckout()">Checkout</button>
@@ -193,31 +183,16 @@ margin:10px 0;
 </div>
 </div>
 
-<!-- CHECKOUT -->
-<div class="modal" id="checkoutModal">
-<div class="modal-content">
-<h2>Checkout</h2>
-
-<input id="name" placeholder="Name">
-<input id="email" placeholder="Email">
-<textarea id="address" placeholder="Address"></textarea>
-
-<button onclick="placeOrder()">Place Order</button>
-<button onclick="backCart()">Back</button>
-</div>
-</div>
-
 <script>
 
 const products=[
-{name:"Royal Watch",price:5000,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30"},
-{name:"Premium Shoes",price:3000,img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff"},
-{name:"Designer Bag",price:2000,img:"https://images.unsplash.com/photo-1548036328-c9fa89d128fa"}
+{name:"Watch",price:5000,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30"},
+{name:"Shoes",price:3000,img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff"}
 ];
 
 let cart=[];
 
-/* RENDER PRODUCTS */
+/* RENDER */
 function render(){
 let html="";
 products.forEach((p,i)=>{
@@ -231,10 +206,10 @@ html+=`
 
 <button 
 onclick="add(${i}, this)"
-${inCart ? 'disabled' : ''}
-class="${inCart ? 'added':''}"
+${inCart?'disabled':''}
+class="${inCart?'added':''}"
 >
-${inCart ? 'Added':'Add to Cart'}
+${inCart?'Added':'Add'}
 </button>
 
 </div>`;
@@ -242,25 +217,24 @@ ${inCart ? 'Added':'Add to Cart'}
 document.getElementById("products").innerHTML=html;
 }
 
-/* ADD TO CART */
+/* ADD */
 function add(i,btn){
 cart.push(products[i]);
-
 btn.innerText="Added";
 btn.classList.add("added");
 btn.disabled=true;
-
 update();
 }
 
-/* UPDATE COUNT */
+/* UPDATE */
 function update(){
 document.getElementById("count").innerText=cart.length;
 }
 
-/* OPEN CART (FIXED) */
+/* CART FIXED */
 function openCart(){
-document.getElementById("cartModal").style.display="block";
+const modal = document.getElementById("cartModal");
+modal.style.display="block";
 renderCart();
 }
 
@@ -271,7 +245,6 @@ let total=0;
 
 cart.forEach((item,i)=>{
 total+=item.price;
-
 html+=`
 <div class="cart-item">
 <span>${item.name}</span>
@@ -290,31 +263,6 @@ cart.splice(i,1);
 renderCart();
 render();
 update();
-}
-
-/* CHECKOUT */
-function openCheckout(){
-closeModal('cartModal');
-document.getElementById("checkoutModal").style.display="block";
-}
-
-function backCart(){
-closeModal('checkoutModal');
-openCart();
-}
-
-/* PLACE ORDER */
-function placeOrder(){
-const name=document.getElementById("name").value;
-
-if(!name){
-alert("Please fill details");
-return;
-}
-
-alert("Order placed successfully 🎉");
-cart=[];
-location.reload();
 }
 
 /* CLOSE */
