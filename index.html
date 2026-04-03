@@ -9,7 +9,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
 <style>
-
 body{
 margin:0;
 font-family:'Poppins',sans-serif;
@@ -17,7 +16,7 @@ background:#0f172a;
 color:white;
 }
 
-/* HEADER FIXED */
+/* HEADER */
 header{
 position:fixed;
 top:0;
@@ -31,15 +30,12 @@ backdrop-filter:blur(15px);
 z-index:1000;
 }
 
-/* BIGGER BRAND */
 .logo{
 font-size:28px;
 font-family:'Playfair Display',serif;
-font-weight:700;
-letter-spacing:1px;
 }
 
-/* SMALL CART BUTTON */
+/* CART BUTTON */
 .cart-btn{
 background:linear-gradient(45deg,#d4af37,#f5d76e);
 color:black;
@@ -47,28 +43,22 @@ padding:6px 14px;
 border-radius:20px;
 cursor:pointer;
 font-size:14px;
-font-weight:600;
-transition:.3s;
-z-index:1001;
 }
 
-.cart-btn:hover{
-transform:scale(1.05);
-}
-
-/* HERO */
+/* HERO SMALL */
 .hero{
-height:70vh;
+height:40vh;
 display:flex;
-flex-direction:column;
 justify-content:center;
 align-items:center;
-background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+text-align:center;
 position:relative;
-overflow:hidden;
 margin-top:60px;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+overflow:hidden;
 }
 
+/* INDIAN ART ANIMATION */
 .hero::before{
 content:"";
 position:absolute;
@@ -76,26 +66,27 @@ width:200%;
 height:200%;
 background-image:
 radial-gradient(circle,#ff9933 2px,transparent 2px),
-radial-gradient(circle,#138808 2px,transparent 2px);
-background-size:40px 40px;
+radial-gradient(circle,#138808 2px,transparent 2px),
+radial-gradient(circle,#ffffff 1px,transparent 1px);
+background-size:50px 50px;
 opacity:0.15;
-animation: movePattern 20s linear infinite;
+animation: moveArt 25s linear infinite;
 }
 
-@keyframes movePattern{
+@keyframes moveArt{
 0%{transform:translate(0,0);}
-100%{transform:translate(-200px,-200px);}
+100%{transform:translate(-300px,-300px);}
 }
 
 .hero h1{
-font-size:52px;
-font-family:'Playfair Display',serif;
+font-size:42px;
 z-index:1;
+font-family:'Playfair Display',serif;
 }
 
 /* PRODUCTS */
 .products{
-padding:40px 25px;
+padding:30px;
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
 gap:20px;
@@ -103,8 +94,8 @@ gap:20px;
 
 .card{
 background:rgba(255,255,255,0.05);
-border-radius:15px;
 padding:15px;
+border-radius:15px;
 }
 
 .card img{
@@ -120,15 +111,15 @@ border:none;
 padding:10px;
 border-radius:8px;
 cursor:pointer;
+margin-top:5px;
 }
 
 button.added{
 background:gray;
 color:white;
-cursor:not-allowed;
 }
 
-/* MODAL FIX */
+/* MODALS */
 .modal{
 display:none;
 position:fixed;
@@ -148,7 +139,16 @@ margin:12% auto;
 border-radius:15px;
 }
 
-/* CART ITEM */
+/* FORM */
+input,textarea{
+width:100%;
+padding:10px;
+margin:10px 0;
+border-radius:8px;
+border:none;
+}
+
+/* CART ITEMS */
 .cart-item{
 display:flex;
 justify-content:space-between;
@@ -166,7 +166,7 @@ margin:10px 0;
 </header>
 
 <section class="hero">
-<h1>Luxury Indian Store</h1>
+<h1>Luxury Indian Shopping</h1>
 </section>
 
 <section class="products" id="products"></section>
@@ -175,11 +175,27 @@ margin:10px 0;
 <div class="modal" id="cartModal">
 <div class="modal-content">
 <h2>Cart</h2>
+
 <div id="cartItems"></div>
+
 <h3>Total: ₹<span id="total">0</span></h3>
 
-<button onclick="openCheckout()">Checkout</button>
+<button onclick="goCheckout()">Checkout</button>
 <button onclick="closeModal('cartModal')">Close</button>
+</div>
+</div>
+
+<!-- CHECKOUT -->
+<div class="modal" id="checkoutModal">
+<div class="modal-content">
+<h2>Place Order</h2>
+
+<input id="name" placeholder="Full Name">
+<input id="email" placeholder="Email">
+<textarea id="address" placeholder="Address"></textarea>
+
+<button onclick="placeOrder()">Confirm Order</button>
+<button onclick="backCart()">Back</button>
 </div>
 </div>
 
@@ -209,7 +225,7 @@ onclick="add(${i}, this)"
 ${inCart?'disabled':''}
 class="${inCart?'added':''}"
 >
-${inCart?'Added':'Add'}
+${inCart?'Added':'Add to Cart'}
 </button>
 
 </div>`;
@@ -231,20 +247,19 @@ function update(){
 document.getElementById("count").innerText=cart.length;
 }
 
-/* CART FIXED */
+/* CART */
 function openCart(){
-const modal = document.getElementById("cartModal");
-modal.style.display="block";
+document.getElementById("cartModal").style.display="block";
 renderCart();
 }
 
-/* RENDER CART */
 function renderCart(){
 let html="";
 let total=0;
 
 cart.forEach((item,i)=>{
 total+=item.price;
+
 html+=`
 <div class="cart-item">
 <span>${item.name}</span>
@@ -263,6 +278,35 @@ cart.splice(i,1);
 renderCart();
 render();
 update();
+}
+
+/* CHECKOUT FLOW FIXED */
+function goCheckout(){
+closeModal('cartModal');
+document.getElementById("checkoutModal").style.display="block";
+}
+
+function backCart(){
+closeModal('checkoutModal');
+openCart();
+}
+
+/* PLACE ORDER */
+function placeOrder(){
+
+const name=document.getElementById("name").value;
+const email=document.getElementById("email").value;
+const address=document.getElementById("address").value;
+
+if(!name || !email || !address){
+alert("Please fill all details");
+return;
+}
+
+alert("Order placed successfully 🎉");
+
+cart=[];
+location.reload();
 }
 
 /* CLOSE */
