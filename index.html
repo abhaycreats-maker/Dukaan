@@ -3,174 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Luxury Store</title>
+<title>DesiCart 🛒</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <style>
 body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-    color: white;
+    margin:0;
+    font-family:Poppins;
+    background:#f5f5f5;
 }
 
-/* HERO */
-.hero {
-    padding: 60px 20px;
-    text-align: center;
-    background: radial-gradient(circle at top, #ff9933, #138808, #000080);
-    font-family: 'Playfair Display', serif;
-    animation: fadeIn 1.5s ease;
-}
-
-.hero h1 {
-    font-size: 40px;
-    letter-spacing: 2px;
-}
-
-/* LAYOUT */
-.container {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 20px;
-    padding: 20px;
-}
-
-/* SIDEBAR */
-.sidebar {
-    backdrop-filter: blur(20px);
-    background: rgba(255,255,255,0.05);
-    padding: 20px;
-    border-radius: 20px;
+/* HEADER */
+header {
+    background: linear-gradient(90deg,#ff9933,#138808);
+    color:white;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
 }
 
 /* PRODUCTS */
 .products {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
-    gap: 20px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+    padding:20px;
 }
 
 .card {
-    background: rgba(255,255,255,0.07);
-    border-radius: 20px;
-    padding: 15px;
-    transition: 0.4s;
+    background:white;
+    border-radius:10px;
+    padding:10px;
+    transition:.3s;
 }
 
 .card:hover {
-    transform: translateY(-10px) scale(1.03);
+    transform:scale(1.03);
 }
 
-/* IMAGE */
 .card img {
-    width: 100%;
-    border-radius: 15px;
-    transition: 0.3s;
-}
-.card img:hover {
-    transform: scale(1.1);
+    width:100%;
+    border-radius:10px;
 }
 
 /* BUTTON */
 button {
-    background: linear-gradient(45deg, #ff6a00, #ee0979);
-    border: none;
-    padding: 10px;
-    color: white;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-button:hover {
-    transform: translateY(-3px);
+    background:#ff6a00;
+    border:none;
+    padding:10px;
+    color:white;
+    border-radius:5px;
+    cursor:pointer;
 }
 
-/* DISABLED BUTTON */
-button.added {
-    background: gray;
-    cursor: not-allowed;
-}
-
-/* CART PANEL */
-.cartPanel {
-    position: fixed;
-    right: 20px;
-    top: 20px;
-    background: black;
-    padding: 15px;
-    border-radius: 10px;
-}
-
-/* MODAL */
+/* MODALS */
 .modal {
-    display: none;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
+    display:none;
+    position:fixed;
+    top:0;left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
 }
 
 .modal-content {
-    background: #111;
-    padding: 20px;
-    width: 350px;
-    margin: 8% auto;
-    border-radius: 15px;
+    background:white;
+    padding:20px;
+    width:350px;
+    margin:10% auto;
+    border-radius:10px;
 }
 
-input, textarea {
-    width: 100%;
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
+/* IMAGE GALLERY */
+.gallery img {
+    width:60px;
+    margin:5px;
+    cursor:pointer;
 }
 
-/* ANIMATION */
-@keyframes fadeIn {
-    from {opacity:0; transform:translateY(30px);}
-    to {opacity:1;}
+input,textarea {
+    width:100%;
+    padding:10px;
+    margin:10px 0;
 }
 </style>
 </head>
 
 <body>
 
-<div class="hero">
-    <h1>Luxury Store ✨</h1>
-    <p>Premium Indian Aesthetic Experience</p>
+<header>
+<h2>DesiCart 🇮🇳</h2>
+<button onclick="openCart()">Cart (<span id="cartCount">0</span>)</button>
+</header>
+
+<div class="products" id="products"></div>
+
+<!-- PRODUCT DETAIL -->
+<div class="modal" id="detailModal">
+<div class="modal-content">
+    <img id="mainImg" width="100%">
+    <div class="gallery" id="gallery"></div>
+
+    <h3 id="pName"></h3>
+    <p id="pPrice"></p>
+
+    <button onclick="addToCartDetail()">Add to Cart</button>
+    <button onclick="closeModal('detailModal')">Close</button>
+</div>
 </div>
 
-<div class="container">
-
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <h3>Filters</h3>
-        <button onclick="filterProducts('all')">All</button>
-        <button onclick="filterProducts('premium')">Premium</button>
-        <button onclick="filterProducts('budget')">Budget</button>
-
-        <hr>
-
-        <button onclick="openCart()">View Cart 🛒</button>
-    </div>
-
-    <!-- PRODUCTS -->
-    <div class="products" id="productList"></div>
-
-</div>
-
-<!-- CART PAGE -->
+<!-- CART -->
 <div class="modal" id="cartModal">
 <div class="modal-content">
-    <h2>Cart</h2>
+    <h2>Your Cart</h2>
     <div id="cartItems"></div>
-    <h3>Total: ₹<span id="totalPrice">0</span></h3>
+    <h3>Total: ₹<span id="total"></span></h3>
 
     <button onclick="openCheckout()">Checkout</button>
-    <button onclick="closeCart()">Back</button>
+    <button onclick="closeModal('cartModal')">Close</button>
 </div>
 </div>
 
@@ -189,138 +142,151 @@ input, textarea {
 </div>
 
 <script>
+
+/* EMAILJS INIT */
+(function(){
+    emailjs.init("YOUR_PUBLIC_KEY");
+})();
+
+/* PRODUCTS */
 const products = [
 {
 name:"Premium Watch",
 price:5000,
-type:"premium",
 images:[
 "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
 "https://images.unsplash.com/photo-1519741497674-611481863552"
 ]
 },
 {
-name:"Luxury Shoes",
+name:"Shoes",
 price:3000,
-type:"premium",
 images:[
 "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
 "https://images.unsplash.com/photo-1528701800489-20be3c4c8b4b"
 ]
-},
-{
-name:"Casual Shirt",
-price:800,
-type:"budget",
-images:[
-"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab",
-"https://images.unsplash.com/photo-1596755389378-c31d21fd1273"
-]
-},
-{
-name:"Stylish Bag",
-price:1200,
-type:"budget",
-images:[
-"https://images.unsplash.com/photo-1548036328-c9fa89d128fa",
-"https://images.unsplash.com/photo-1593032465175-481ac7f401a0"
-]
 }
 ];
 
-let cart = [];
+let cart=[];
+let currentProduct=null;
 
-function renderProducts(list){
-    const container = document.getElementById("productList");
+/* RENDER PRODUCTS */
+function render(){
+    const container=document.getElementById("products");
     container.innerHTML="";
 
-    list.forEach((p,i)=>{
-        const inCart = cart.find(item => item.name === p.name);
-
-        container.innerHTML += `
+    products.forEach((p,i)=>{
+        container.innerHTML+=`
         <div class="card">
             <img src="${p.images[0]}" onclick="openDetail(${i})">
             <h3>${p.name}</h3>
             <p>₹${p.price}</p>
-
-            <button 
-                class="${inCart ? 'added' : ''}" 
-                onclick="addToCart(${i}, this)"
-                ${inCart ? 'disabled' : ''}
-            >
-                ${inCart ? 'Added' : 'Add to Cart'}
-            </button>
+            <button onclick="addToCart(${i})">Add to Cart</button>
         </div>`;
     });
 }
 
-function addToCart(i, btn){
-    cart.push(products[i]);
-    btn.innerText="Added";
-    btn.classList.add("added");
-    btn.disabled=true;
+/* DETAIL PAGE */
+function openDetail(i){
+    currentProduct=products[i];
+    document.getElementById("detailModal").style.display="block";
+
+    document.getElementById("mainImg").src=currentProduct.images[0];
+    document.getElementById("pName").innerText=currentProduct.name;
+    document.getElementById("pPrice").innerText="₹"+currentProduct.price;
+
+    let gallery="";
+    currentProduct.images.forEach(img=>{
+        gallery+=`<img src="${img}" onclick="changeImg('${img}')">`;
+    });
+    document.getElementById("gallery").innerHTML=gallery;
+}
+
+function changeImg(src){
+    document.getElementById("mainImg").src=src;
 }
 
 /* CART */
+function addToCart(i){
+    cart.push(products[i]);
+    updateCart();
+}
+
+function addToCartDetail(){
+    cart.push(currentProduct);
+    updateCart();
+}
+
+function updateCart(){
+    document.getElementById("cartCount").innerText=cart.length;
+}
+
+/* CART PAGE */
 function openCart(){
     document.getElementById("cartModal").style.display="block";
-    renderCart();
-}
 
-function closeCart(){
-    document.getElementById("cartModal").style.display="none";
-}
-
-function renderCart(){
-    const container=document.getElementById("cartItems");
-    container.innerHTML="";
+    let html="";
     let total=0;
 
-    cart.forEach((item,index)=>{
+    cart.forEach((item,i)=>{
         total+=item.price;
-        container.innerHTML+=`
-        <p>${item.name} - ₹${item.price} 
-        <button onclick="removeItem(${index})">X</button></p>`;
+        html+=`${item.name} ₹${item.price} 
+        <button onclick="removeItem(${i})">X</button><br>`;
     });
 
-    document.getElementById("totalPrice").innerText=total;
+    document.getElementById("cartItems").innerHTML=html;
+    document.getElementById("total").innerText=total;
 }
 
 function removeItem(i){
     cart.splice(i,1);
-    renderCart();
-    renderProducts(products);
+    openCart();
+    updateCart();
 }
 
 /* CHECKOUT */
 function openCheckout(){
-    document.getElementById("cartModal").style.display="none";
+    closeModal('cartModal');
     document.getElementById("checkoutModal").style.display="block";
 }
 
 function backToCart(){
-    document.getElementById("checkoutModal").style.display="none";
-    document.getElementById("cartModal").style.display="block";
+    closeModal('checkoutModal');
+    openCart();
 }
 
+/* PLACE ORDER */
 function placeOrder(){
-    alert("Order Placed Successfully 🚀");
-    cart=[];
-    location.reload();
+
+    const name=document.getElementById("name").value;
+    const email=document.getElementById("email").value;
+    const address=document.getElementById("address").value;
+
+    const params={
+        name:name,
+        email:email,
+        address:address,
+        order: JSON.stringify(cart)
+    };
+
+    emailjs.send("YOUR_SERVICE_ID","YOUR_TEMPLATE_ID",params)
+    .then(()=>{
+        alert("Order placed successfully!");
+        cart=[];
+        location.reload();
+    })
+    .catch(()=>{
+        alert("Email setup required!");
+    });
 }
 
-/* PRODUCT DETAIL */
-function openDetail(i){
-    alert("Product Page with multiple images coming next upgrade 🚀");
+/* CLOSE MODAL */
+function closeModal(id){
+    document.getElementById(id).style.display="none";
 }
 
-/* FILTER */
-function filterProducts(type){
-    if(type==='all') return renderProducts(products);
-    renderProducts(products.filter(p=>p.type===type));
-}
-
-renderProducts(products);
+render();
 </script>
 
 </body>
