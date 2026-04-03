@@ -5,38 +5,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Luxury Store</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
 <style>
 body{
   margin:0;
   font-family:Poppins;
-  background:#0f2027;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
   color:white;
-  overflow-x:hidden;
 }
 
-/* Animated Indian pattern */
-body::before{
-  content:"";
-  position:fixed;
-  width:200%;
-  height:200%;
-  background:url('https://www.transparenttextures.com/patterns/arabesque.png');
-  opacity:0.07;
-  animation:move 50s linear infinite;
-  z-index:-1;
-}
-@keyframes move{
-  from{transform:translate(0,0);}
-  to{transform:translate(300px,300px);}
-}
-
+/* HERO */
 .hero{
   text-align:center;
   padding:60px 20px;
+  font-family:'Playfair Display';
+  background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.8)),
+  url('https://images.unsplash.com/photo-1604147706283-2b3c2b1c1b75');
+  background-size:cover;
+}
+.hero h1{font-size:40px;}
+
+/* CART */
+.cart-box{
+  position:fixed;
+  right:20px;
+  top:20px;
+  background:#0008;
+  padding:10px;
+  border-radius:10px;
 }
 
+/* BUTTON FIX */
+.checkout-btn{
+  position:fixed;
+  right:20px;
+  top:70px;
+  z-index:10;
+  padding:12px;
+}
+
+/* PRODUCTS */
 .products{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -45,229 +56,269 @@ body::before{
 }
 
 .card{
-  background:#ffffff10;
+  background:#fff1;
   border-radius:15px;
-  overflow:hidden;
+  padding:10px;
   cursor:pointer;
-  transition:0.4s;
 }
-.card:hover{
-  transform:scale(1.05);
-}
-
 .card img{
   width:100%;
   height:200px;
   object-fit:cover;
+  transition:0.3s;
 }
-
-.card-content{
-  padding:10px;
+.card img:hover{
+  transform:scale(1.1);
 }
 
 button{
   background:linear-gradient(45deg,#ff6a00,#ee0979);
   border:none;
-  padding:8px 12px;
+  padding:8px;
   color:white;
   border-radius:6px;
   cursor:pointer;
 }
 
-/* MODAL */
+button.disabled{
+  background:gray;
+  cursor:not-allowed;
+}
+
+/* CART PAGE */
+.cart-page{
+  position:fixed;
+  right:0;
+  top:0;
+  width:300px;
+  height:100%;
+  background:#111;
+  padding:20px;
+  display:none;
+}
+
+/* MODALS */
 .modal{
   position:fixed;
   inset:0;
-  background:#000a;
+  background:#000c;
   display:none;
   justify-content:center;
   align-items:center;
 }
-
 .box{
   background:#111;
   padding:20px;
-  border-radius:12px;
+  border-radius:10px;
   width:320px;
 }
 
 /* SLIDER */
-.slider{
-  position:relative;
-}
-
 .slider img{
   width:100%;
   height:200px;
   object-fit:cover;
-  border-radius:10px;
-  transition:0.3s;
-}
-.slider img:hover{
-  transform:scale(1.2);
 }
 
-.nav-btn{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  background:#0008;
-  border:none;
-  color:white;
-  padding:5px 10px;
-  cursor:pointer;
-}
-.prev{left:5px;}
-.next{right:5px;}
 </style>
 </head>
 
 <body>
 
 <div class="hero">
-<h1>Luxury Store</h1>
-<p>Premium Indian Inspired UI</p>
+<h1>Luxury Indian Store ✨</h1>
+<p>Premium cultural products</p>
 </div>
+
+<div class="cart-box">Cart: <span id="count">0</span></div>
+<button class="checkout-btn" onclick="openCart()">Cart</button>
 
 <div class="products" id="products"></div>
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <div class="box" id="modalBox">
-    <div class="slider">
-      <button class="nav-btn prev" id="prevBtn">‹</button>
-      <img id="slideImg">
-      <button class="nav-btn next" id="nextBtn">›</button>
-    </div>
+<!-- CART -->
+<div class="cart-page" id="cartPage">
+<h2>Cart</h2>
+<div id="cartItems"></div>
+<h3 id="total"></h3>
+<button onclick="openCheckout()">Checkout</button>
+<button onclick="closeCart()">Close</button>
+</div>
 
-    <h3 id="pname"></h3>
-    <p id="pprice"></p>
+<!-- PRODUCT DETAIL -->
+<div class="modal" id="detailModal">
+<div class="box">
+<img id="detailImg">
+<h3 id="detailName"></h3>
+<p id="detailPrice"></p>
+<button onclick="closeDetail()">Close</button>
+</div>
+</div>
 
-    <button id="closeBtn">Close</button>
-  </div>
+<!-- CHECKOUT -->
+<div class="modal" id="checkoutModal">
+<div class="box">
+<h3>Checkout</h3>
+<div id="summary"></div>
+<input id="name" placeholder="Name">
+<input id="email" placeholder="Email">
+<textarea id="address" placeholder="Address"></textarea>
+<button onclick="placeOrder()">Place Order</button>
+<button onclick="backToCart()">Back</button>
+</div>
+</div>
+
+<!-- SUCCESS -->
+<div class="modal" id="successModal">
+<div class="box">
+<h2>Order Placed ✅</h2>
+<p id="orderText"></p>
+<button onclick="goHome()">Home</button>
+</div>
 </div>
 
 <script>
-const products = [
+emailjs.init("YOUR_PUBLIC_KEY");
+
+const products=[
 {
-  name:"Watch",
-  price:5000,
-  imgs:[
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
-    "https://images.unsplash.com/photo-1518544801976-3e159e50e5bb",
-    "https://images.unsplash.com/photo-1508057198894-247b23fe5ade"
-  ]
+name:"Watch",
+price:5000,
+imgs:[
+"https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+"https://images.unsplash.com/photo-1518544801976-3e159e50e5bb",
+"https://images.unsplash.com/photo-1508057198894-247b23fe5ade"
+]
+},
+{
+name:"Shoes",
+price:3000,
+imgs:[
+"https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+"https://images.unsplash.com/photo-1600180758890-6b94519a8ba3"
+]
 }
 ];
 
-let current = 0;
-let images = [];
-let sliderInterval = null;
+let cart=[];
 
-const productsEl = document.getElementById("products");
-const modal = document.getElementById("modal");
-const modalBox = document.getElementById("modalBox");
-const slideImg = document.getElementById("slideImg");
+/* RENDER */
+function render(){
+const el=document.getElementById("products");
+el.innerHTML="";
 
-function renderProducts(){
-  productsEl.innerHTML = "";
+products.forEach((p,i)=>{
+const added=cart.find(x=>x.name===p.name);
 
-  products.forEach((p,i)=>{
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <img src="${p.imgs[0]}" alt="">
-      <div class="card-content">
-        <h3>${p.name}</h3>
-        <p>₹${p.price}</p>
-        <button>Add to Cart</button>
-      </div>
-    `;
-
-    card.addEventListener("click", ()=>{
-      openProduct(i);
-    });
-
-    const btn = card.querySelector("button");
-    btn.addEventListener("click",(e)=>{
-      e.stopPropagation();
-      alert("Added to cart");
-    });
-
-    productsEl.appendChild(card);
-  });
+el.innerHTML+=`
+<div class="card" onclick="openDetail(${i})">
+<img src="${p.imgs[0]}">
+<h3>${p.name}</h3>
+<p>₹${p.price}</p>
+<button class="${added?'disabled':''}" onclick="event.stopPropagation();add(${i})">
+${added?'Added':'Add to Cart'}
+</button>
+</div>`;
+});
 }
 
-function openProduct(i){
-  images = products[i].imgs;
-  current = 0;
-
-  document.getElementById("pname").innerText = products[i].name;
-  document.getElementById("pprice").innerText = "₹" + products[i].price;
-
-  modal.style.display = "flex";
-
-  updateSlide();
-  startAutoSlide();
+/* CART */
+function add(i){
+if(cart.find(x=>x.name===products[i].name)) return;
+cart.push(products[i]);
+updateCart();
+render();
 }
 
-function updateSlide(){
-  slideImg.src = images[current];
+function remove(i){
+cart.splice(i,1);
+updateCart();
+render();
 }
 
-function next(){
-  current = (current + 1) % images.length;
-  updateSlide();
-}
+function updateCart(){
+document.getElementById("count").innerText=cart.length;
 
-function prev(){
-  current = (current - 1 + images.length) % images.length;
-  updateSlide();
-}
+let html="";
+let total=0;
 
-function startAutoSlide(){
-  stopAutoSlide();
-  sliderInterval = setInterval(next, 3000);
-}
-
-function stopAutoSlide(){
-  if(sliderInterval){
-    clearInterval(sliderInterval);
-    sliderInterval = null;
-  }
-}
-
-function closeModal(){
-  modal.style.display = "none";
-  stopAutoSlide();
-}
-
-/* EVENTS */
-document.getElementById("nextBtn").addEventListener("click",(e)=>{
-  e.stopPropagation();
-  next();
+cart.forEach((item,i)=>{
+total+=item.price;
+html+=`<p>${item.name} ₹${item.price}
+<button onclick="remove(${i})">X</button></p>`;
 });
 
-document.getElementById("prevBtn").addEventListener("click",(e)=>{
-  e.stopPropagation();
-  prev();
+document.getElementById("cartItems").innerHTML=html;
+document.getElementById("total").innerText="Total ₹"+total;
+}
+
+/* CART UI */
+function openCart(){
+document.getElementById("cartPage").style.display="block";
+}
+function closeCart(){
+document.getElementById("cartPage").style.display="none";
+}
+
+/* DETAIL */
+function openDetail(i){
+document.getElementById("detailModal").style.display="flex";
+document.getElementById("detailImg").src=products[i].imgs[0];
+document.getElementById("detailName").innerText=products[i].name;
+document.getElementById("detailPrice").innerText="₹"+products[i].price;
+}
+function closeDetail(){
+document.getElementById("detailModal").style.display="none";
+}
+
+/* CHECKOUT */
+function openCheckout(){
+if(cart.length===0) return alert("Cart empty");
+let html="";
+let total=0;
+
+cart.forEach(p=>{
+total+=p.price;
+html+=`<p>${p.name} ₹${p.price}</p>`;
 });
 
-document.getElementById("closeBtn").addEventListener("click",closeModal);
+html+=`<h3>Total ₹${total}</h3>`;
 
-modal.addEventListener("click",closeModal);
+document.getElementById("summary").innerHTML=html;
+document.getElementById("checkoutModal").style.display="flex";
+closeCart();
+}
 
-modalBox.addEventListener("click",(e)=>{
-  e.stopPropagation();
-});
+function backToCart(){
+document.getElementById("checkoutModal").style.display="none";
+openCart();
+}
 
-document.addEventListener("keydown",(e)=>{
-  if(e.key === "Escape") closeModal();
-});
+/* ORDER */
+function placeOrder(){
+let name=document.getElementById("name").value;
+let email=document.getElementById("email").value;
+let address=document.getElementById("address").value;
 
-/* INIT */
-renderProducts();
+if(!name||!email||!address) return alert("Fill all");
+
+let total=cart.reduce((a,b)=>a+b.price,0);
+
+document.getElementById("orderText").innerText=
+`Name: ${name} | Total ₹${total}`;
+
+document.getElementById("checkoutModal").style.display="none";
+document.getElementById("successModal").style.display="flex";
+
+cart=[];
+updateCart();
+render();
+}
+
+function goHome(){
+document.getElementById("successModal").style.display="none";
+}
+
+render();
 </script>
 
 </body>
